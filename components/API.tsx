@@ -7,7 +7,7 @@ import {
   Button,
   TouchableOpacity,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {SelectList} from 'react-native-dropdown-select-list';
 
 export default function API() {
@@ -19,7 +19,7 @@ export default function API() {
   const [playerData, setPlayerData] = useState([]);
   const [statComparisons, setStatComparisons] = useState([]);
 
-  // retrieve players
+  // retrieve players & set state
   const getPlayers = async player => {
     const res = await fetch(
       `https://www.balldontlie.io/api/v1/players?search=${player}&per_page=15`,
@@ -28,24 +28,37 @@ export default function API() {
     setPlayerData(data.data);
   };
 
-  // useEffect(() => {
-  //   getPlayers('curry');
-  // }, []);
-
   const handlePlayerPress = async (id, firstName, lastName, selectedYear) => {
+    // set selected year if not specified
     selectedYear = selectedYear ? selectedYear : '2022';
+
+    // return early if player already selected for comparison
+    let objectExists = statComparisons.some(
+      object => object?.id === id && object?.selectedYear === selectedYear,
+    );
+    if (objectExists) return;
+
+    // fetch API call
     const res = await fetch(
       `https://www.balldontlie.io/api/v1/season_averages?season=${selectedYear}&player_ids[]=${id}`,
     );
     const data = await res.json();
 
-    // thing to do instead:
-    // have him select players to compare from years
+    // add fetched data to 'stat comparisons'
     setStatComparisons([
       ...statComparisons,
       {id, firstName, lastName, selectedYear, stats: data.data},
     ]);
   };
+
+  // years to populate dropdown
+  const years = [];
+  for (let i = 2022; i > 1945; i--) {
+    years.push({
+      key: `${i}`,
+      value: `${i}-${(i + 1).toString().slice(-2)}`,
+    });
+  }
 
   return (
     <ScrollView>
@@ -66,13 +79,7 @@ export default function API() {
               onChangeText={e => setSearchPlayer(e)}
             />
             <SelectList
-              data={[
-                {key: '2012', value: '2012-13'},
-                {key: '2019', value: '2019-20'},
-                {key: '2020', value: '2020-21'},
-                {key: '2021', value: '2021-22'},
-                {key: '2022', value: '2022-23'},
-              ]}
+              data={years}
               setSelected={setSelectedYear}
               placeholder="Select Year"
             />
@@ -114,26 +121,23 @@ export default function API() {
                 <Text style={styles.headerText}>Rbs</Text>
                 <Text style={styles.headerText}>Asts</Text>
               </View>
-              {statComparisons.map(player => (
-                <View
-                  key={`${player.id}.${player.selectedYear}`}
-                  style={styles.playerStats}>
-                  <View style={styles.playerNameStats}>
-                    <Text style={styles.nameText}>{player.firstName}</Text>
-                    <Text style={styles.nameText}>{player.lastName}</Text>
+              {statComparisons.map(player => {
+                return (
+                  <View
+                    key={`${player.id}.${player.selectedYear}`}
+                    style={styles.playerStats}>
+                    <View style={styles.playerNameStats}>
+                      <Text style={styles.nameText}>{player.firstName}</Text>
+                      <Text style={styles.nameText}>{player.lastName}</Text>
+                    </View>
+                    <Text>{player.selectedYear}</Text>
+                    <Text>{player.stats[0]?.pts || 0}</Text>
+                    <Text>{player.stats[0]?.reb || 0}</Text>
+                    <Text>{player.stats[0]?.ast || 0}</Text>
+                    {/* also have access to stl, blk, turnover, fg_pct, fg3_pct, ft_pct */}
                   </View>
-                  <Text>{player.selectedYear}</Text>
-                  <Text>{player.stats[0]?.pts}</Text>
-                  <Text>{player.stats[0]?.reb}</Text>
-                  <Text>{player.stats[0]?.ast}</Text>
-                  {/* <Text>{player.stats[0]?.stl}</Text>
-              <Text>{player.stats[0]?.blk}</Text>
-              <Text>{player.stats[0]?.turnover}</Text>
-              <Text>{player.stats[0]?.fg_pct}</Text>
-              <Text>{player.stats[0]?.fg3_pct}</Text>
-              <Text>{player.stats[0]?.ft_pct}</Text> */}
-                </View>
-              ))}
+                );
+              })}
             </View>
           ) : (
             <View></View>
