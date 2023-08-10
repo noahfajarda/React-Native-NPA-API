@@ -7,8 +7,10 @@ import {
   Button,
   TouchableOpacity,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {SelectList} from 'react-native-dropdown-select-list';
+
+import {styles} from '../styles/styles';
 
 export default function API() {
   // user selection states
@@ -18,6 +20,7 @@ export default function API() {
   // data states
   const [playerData, setPlayerData] = useState([]);
   const [statComparisons, setStatComparisons] = useState([]);
+  const [highestStats, setHighestStats] = useState({pts: 0, reb: 0, ast: 0});
 
   // retrieve players & set state
   const getPlayers = async player => {
@@ -51,7 +54,7 @@ export default function API() {
     ]);
   };
 
-  // years to populate dropdown
+  // years to populate dropdown from 1945-2023
   const years = [];
   for (let i = 2022; i > 1945; i--) {
     years.push({
@@ -59,6 +62,16 @@ export default function API() {
       value: `${i}-${(i + 1).toString().slice(-2)}`,
     });
   }
+
+  useEffect(() => {
+    // check for highest stats
+    statComparisons.forEach(player => {
+      if (player.stats[0]?.pts >= highestStats.pts) {
+        setHighestStats({...highestStats, pts: player.stats[0]?.pts});
+        console.log('Highest stats pts: ' + highestStats.pts);
+      }
+    });
+  }, [statComparisons]);
 
   return (
     <ScrollView>
@@ -101,7 +114,10 @@ export default function API() {
           <View style={styles.buttonContainer}>
             <View style={styles.button}>
               <Button
-                onPress={() => setStatComparisons([])}
+                onPress={() => {
+                  setHighestStats({pts: 0, reb: 0, ast: 0});
+                  setStatComparisons([]);
+                }}
                 title="Reset Comparisons"
                 color="#f2072b"
                 accessibilityLabel="Reset Comparisons"
@@ -122,6 +138,14 @@ export default function API() {
                 <Text style={styles.headerText}>Asts</Text>
               </View>
               {statComparisons.map(player => {
+                const isHighestPoints =
+                  player.stats[0]?.pts === highestStats.pts;
+
+                const ptsStyles = {
+                  color: isHighestPoints ? 'green' : 'black',
+                  fontWeight: isHighestPoints ? 'bold' : 'normal',
+                };
+
                 return (
                   <View
                     key={`${player.id}.${player.selectedYear}`}
@@ -131,7 +155,7 @@ export default function API() {
                       <Text style={styles.nameText}>{player.lastName}</Text>
                     </View>
                     <Text>{player.selectedYear}</Text>
-                    <Text>{player.stats[0]?.pts || 0}</Text>
+                    <Text style={ptsStyles}>{player.stats[0]?.pts || 0}</Text>
                     <Text>{player.stats[0]?.reb || 0}</Text>
                     <Text>{player.stats[0]?.ast || 0}</Text>
                     {/* also have access to stl, blk, turnover, fg_pct, fg3_pct, ft_pct */}
@@ -178,80 +202,3 @@ export default function API() {
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  title: {
-    display: 'flex',
-    padding: 20,
-    fontSize: 30,
-    fontWeight: '600',
-    color: 'white',
-    textAlign: 'center',
-    backgroundColor: 'teal',
-  },
-  input: {
-    backgroundColor: '#c7d7f0',
-    borderRadius: 10,
-    padding: 10,
-    width: '100%',
-  },
-  inputContainer: {
-    padding: 10,
-  },
-  buttonContainer: {
-    alignItems: 'center',
-    width: '100%',
-    padding: 5,
-  },
-  button: {
-    width: '60%',
-  },
-  playerContainer: {
-    padding: 10,
-    alignItems: 'center',
-  },
-  playerName: {
-    fontWeight: '600',
-    color: '#313794',
-    fontSize: 20,
-  },
-  playerTeam: {
-    fontWeight: '300',
-  },
-  statComparisonsContainer: {
-    display: 'flex',
-    width: '100%',
-    padding: 15,
-  },
-  statComparisonsHeader: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingLeft: 25,
-    paddingRight: 5,
-    paddingTop: 5,
-    paddingBottom: 5,
-  },
-  nameText: {
-    color: 'red',
-  },
-  headerText: {
-    color: 'black',
-  },
-  playerStats: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingLeft: 10,
-    paddingRight: 10,
-    paddingTop: 5,
-    paddingBottom: 5,
-  },
-  playerNameStats: {
-    display: 'flex',
-    flexDirection: 'column',
-    padding: 2,
-    alignItems: 'center',
-    width: 70,
-  },
-});
