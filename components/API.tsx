@@ -105,26 +105,39 @@ export default function API() {
 
         {/* display stats if available */}
         <View style={styles.statComparisonsContainer}>
-          {statComparisons.map(player => (
-            <View
-              key={`${player.id}.${player.selectedYear}`}
-              style={styles.playerStats}>
-              <View style={styles.playerNameStats}>
-                <Text>{player.firstName}</Text>
-                <Text>{player.lastName}</Text>
+          {statComparisons.length ? (
+            <View>
+              <View style={styles.statComparisonsHeader}>
+                <Text style={styles.headerText}>Player</Text>
+                <Text style={styles.headerText}>Year</Text>
+                <Text style={styles.headerText}>Pts</Text>
+                <Text style={styles.headerText}>Rbs</Text>
+                <Text style={styles.headerText}>Asts</Text>
               </View>
-              <Text>{player.selectedYear}</Text>
-              <Text>{player.stats[0]?.pts}</Text>
-              <Text>{player.stats[0]?.reb}</Text>
-              <Text>{player.stats[0]?.ast}</Text>
-              {/* <Text>{player.stats[0]?.stl}</Text>
+              {statComparisons.map(player => (
+                <View
+                  key={`${player.id}.${player.selectedYear}`}
+                  style={styles.playerStats}>
+                  <View style={styles.playerNameStats}>
+                    <Text style={styles.nameText}>{player.firstName}</Text>
+                    <Text style={styles.nameText}>{player.lastName}</Text>
+                  </View>
+                  <Text>{player.selectedYear}</Text>
+                  <Text>{player.stats[0]?.pts}</Text>
+                  <Text>{player.stats[0]?.reb}</Text>
+                  <Text>{player.stats[0]?.ast}</Text>
+                  {/* <Text>{player.stats[0]?.stl}</Text>
               <Text>{player.stats[0]?.blk}</Text>
               <Text>{player.stats[0]?.turnover}</Text>
               <Text>{player.stats[0]?.fg_pct}</Text>
               <Text>{player.stats[0]?.fg3_pct}</Text>
               <Text>{player.stats[0]?.ft_pct}</Text> */}
+                </View>
+              ))}
             </View>
-          ))}
+          ) : (
+            <View></View>
+          )}
         </View>
 
         {/* check player data & map through it */}
@@ -205,6 +218,21 @@ const styles = StyleSheet.create({
     display: 'flex',
     width: '100%',
     padding: 15,
+  },
+  statComparisonsHeader: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingLeft: 25,
+    paddingRight: 5,
+    paddingTop: 5,
+    paddingBottom: 5,
+  },
+  nameText: {
+    color: 'red',
+  },
+  headerText: {
+    color: 'black',
   },
   playerStats: {
     display: 'flex',

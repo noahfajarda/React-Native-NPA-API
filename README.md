@@ -28,10 +28,10 @@ npm run ios
 
 ## Visuals
 
-<div>
+<div align="center">
 
 <img src="./images/screenshot1.png" alt="screenshot1" width="300"/>
-<img src="./images/screenshot2.png" alt="screenshot2" width="300"/>
+<img src="./images/screenshot2.png" alt="screenshot2" width="298"/>
 
 </div>
 
