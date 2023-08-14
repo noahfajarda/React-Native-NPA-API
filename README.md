@@ -35,6 +35,15 @@ npm run ios
 
 </div>
 
+## API documentation
+
+Sample Endpoints:
+https://www.balldontlie.io/api/v1/stats?player_ids[]=1043&end_date=2023-06-02&per_page=100
+https://www.balldontlie.io/api/v1/players?search=stephen%20curry&per_page=15
+
+Documentation:
+https://www.balldontlie.io/home.html#considerations-4
+
 ## Deploys
 
 In Progress

@@ -67,9 +67,22 @@ export default function API() {
     // check for highest stats
     statComparisons.forEach(player => {
       if (player.stats[0]?.pts >= highestStats.pts) {
-        setHighestStats({...highestStats, pts: player.stats[0]?.pts});
+        // DIRECT SET STATE DOESN'T WORK, FIND OUT WHY
+        // setHighestStats({...highestStats, pts: player.stats[0]?.pts});
+        highestStats.pts = player.stats[0]?.pts;
+        console.log(highestStats);
         console.log('Highest stats pts: ' + highestStats.pts);
       }
+      if (player.stats[0]?.reb >= highestStats.reb) {
+        // setHighestStats({...highestStats, reb: player.stats[0]?.reb});
+        highestStats.reb = player.stats[0]?.reb;
+        console.log(highestStats);
+        console.log('Highest stats reb: ' + highestStats.reb);
+      }
+      // if (player.stats[0]?.ast >= highestStats.ast) {
+      //   setHighestStats({...highestStats, ast: player.stats[0]?.ast});
+      //   console.log('Highest stats ast: ' + highestStats.ast);
+      // }
     });
   }, [statComparisons]);
 
@@ -84,18 +97,22 @@ export default function API() {
           {/* input container */}
           <View style={styles.inputContainer}>
             {/* search for 'name' & 'year' */}
-            <TextInput
-              multiline
-              value={searchPlayer}
-              placeholder="Search Player"
-              style={styles.input}
-              onChangeText={e => setSearchPlayer(e)}
-            />
-            <SelectList
-              data={years}
-              setSelected={setSelectedYear}
-              placeholder="Select Year"
-            />
+            <View style={{padding: 2}}>
+              <TextInput
+                multiline
+                value={searchPlayer}
+                placeholder="Search Player"
+                style={styles.input}
+                onChangeText={e => setSearchPlayer(e)}
+              />
+            </View>
+            <View style={{padding: 2}}>
+              <SelectList
+                data={years}
+                setSelected={setSelectedYear}
+                placeholder="Select Year"
+              />
+            </View>
           </View>
 
           {/* search button */}
@@ -140,11 +157,23 @@ export default function API() {
               {statComparisons.map(player => {
                 const isHighestPoints =
                   player.stats[0]?.pts === highestStats.pts;
+                const isHighestRebounds =
+                  player.stats[0]?.reb === highestStats.reb;
+                // const isHighestAssists =
+                //   player.stats[0]?.ast === highestStats.ast;
 
                 const ptsStyles = {
                   color: isHighestPoints ? 'green' : 'black',
                   fontWeight: isHighestPoints ? 'bold' : 'normal',
                 };
+                const rebStyles = {
+                  color: isHighestRebounds ? 'green' : 'black',
+                  fontWeight: isHighestRebounds ? 'bold' : 'normal',
+                };
+                // const astStyles = {
+                //   color: isHighestAssists ? 'green' : 'black',
+                //   fontWeight: isHighestAssists ? 'bold' : 'normal',
+                // };
 
                 return (
                   <View
@@ -156,8 +185,12 @@ export default function API() {
                     </View>
                     <Text>{player.selectedYear}</Text>
                     <Text style={ptsStyles}>{player.stats[0]?.pts || 0}</Text>
-                    <Text>{player.stats[0]?.reb || 0}</Text>
-                    <Text>{player.stats[0]?.ast || 0}</Text>
+                    <Text style={rebStyles}>{player.stats[0]?.reb || 0}</Text>
+                    <Text
+                    // style={astStyles}
+                    >
+                      {player.stats[0]?.ast || 0}
+                    </Text>
                     {/* also have access to stl, blk, turnover, fg_pct, fg3_pct, ft_pct */}
                   </View>
                 );
